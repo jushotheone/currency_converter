@@ -4,6 +4,8 @@ const formgroup = document.querySelectorAll(".form-group select"),
     toCurrency = document.querySelector(".to-currency"),
     getButton = document.querySelector("form button");
 
+let spendingChart;
+
 console.log('Form group elements:', formgroup);
 console.log('From Currency element:', fromCurrency);
 console.log('To Currency element:', toCurrency);
@@ -45,6 +47,7 @@ window.addEventListener("load", () => {
     loadFlag(fromCurrency);
     loadFlag(toCurrency);
     getExchangeRate(); // Ensure exchange rate is fetched on load
+    getHistoricalData(); // Fetch historical data for chart
 });
 
 // Handle Conversion Event
@@ -52,6 +55,7 @@ getButton.addEventListener("click", e => {
     e.preventDefault();
     console.log('Convert button clicked.');
     getExchangeRate();
+    getHistoricalData(); // Fetch and update chart on conversion
 });
 
 function getExchangeRate() {
@@ -62,25 +66,81 @@ function getExchangeRate() {
     console.log(`Fetching exchange rate for ${fromCurrency.value} to ${toCurrency.value}, amount: ${amount}`);
 
     // Using ExchangeRate-API
-    const apiKey = "dcb063aad8ea4242a6e32141"; // Use your correct API Key here
+    const apiKey = "dcb063aad8ea4242a6e32141"; // Your actual API Key
     let url = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/${fromCurrency.value}`;
-    
+
     fetch(url)
-    .then(response => response.json())
-    .then(result => {
-        console.log('Exchange rate data received:', result);
-        if (result.conversion_rates) {
-            let exchangeRate = result.conversion_rates[toCurrency.value];
-            let totalExchangeRate = (amount * exchangeRate).toFixed(2);
-            exchangeRateText.innerText = `${amount} ${fromCurrency.value} = ${totalExchangeRate} ${toCurrency.value}`;
-        } else {
-            console.error('Error fetching exchange rates:', result);
+        .then(response => response.json())
+        .then(result => {
+            console.log('Exchange rate data received:', result);
+            if (result.conversion_rates) {
+                let exchangeRate = result.conversion_rates[toCurrency.value];
+                let totalExchangeRate = (amount * exchangeRate).toFixed(2);
+                exchangeRateText.innerText = `${amount} ${fromCurrency.value} = ${totalExchangeRate} ${toCurrency.value}`;
+            } else {
+                console.error('Error fetching exchange rates:', result);
+                exchangeRateText.innerText = "Something went wrong. Please try again later";
+            }
+        })
+        .catch(error => {
+            console.error('Error in fetch operation:', error);
             exchangeRateText.innerText = "Something went wrong. Please try again later";
+        });
+}function getHistoricalData() {
+    const apiKey = "dcb063aad8ea4242a6e32141"; // Your actual API Key
+    const currency = fromCurrency.value;
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - 6); // Fetch 6 months of historical data
+
+    const startDateString = startDate.toISOString().split('T')[0]; // Format date
+    const endDateString = endDate.toISOString().split('T')[0];
+
+    // Using Thingproxy free proxy
+    let corsProxy = 'https://thingproxy.freeboard.io/fetch/';
+    let url = `${corsProxy}https://v6.exchangerate-api.com/v6/${apiKey}/history/${currency}?start_date=${startDateString}&end_date=${endDateString}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.result === 'success') {
+                updateChart(data.conversion_rates);
+            } else {
+                console.error("Failed to fetch historical data:", data);
+            }
+        })
+        .catch(error => console.error("Error fetching historical data:", error));
+}
+
+
+// Update Chart with Historical Data
+function updateChart(data) {
+    const ctx = document.getElementById('spendingChart').getContext('2d');
+    const labels = Object.keys(data); // Dates
+    const rates = Object.values(data); // Exchange rates
+
+    if (spendingChart) {
+        spendingChart.destroy(); // Destroy the old chart before creating a new one
+    }
+
+    spendingChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: `Historical Exchange Rate (${fromCurrency.value} to ${toCurrency.value})`,
+                data: rates,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
         }
-    })
-    .catch(error => {
-        console.error('Error in fetch operation:', error);
-        exchangeRateText.innerText = "Something went wrong. Please try again later";
     });
 }
 
@@ -94,19 +154,19 @@ document.getElementById('setAlert').addEventListener('click', () => {
 function setCustomAlert(targetRate) {
     const interval = setInterval(() => {
         console.log(`Polling exchange rate every minute for alert. Target rate: ${targetRate}`);
-        const apiKey = "dcb063aad8ea4242a6e32141"; // Use your correct API Key here
+        const apiKey = "dcb063aad8ea4242a6e32141"; // Your actual API Key
         let url = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/${fromCurrency.value}`;
-        
+
         fetch(url)
-        .then(response => response.json())
-        .then(result => {
-            console.log('Polling data received:', result);
-            const currentRate = result.conversion_rates[toCurrency.value];
-            if (currentRate >= targetRate) {
-                alert(`Target rate of ${targetRate} reached: 1 ${fromCurrency.value} = ${currentRate} ${toCurrency.value}`);
-                clearInterval(interval);
-            }
-        });
+            .then(response => response.json())
+            .then(result => {
+                console.log('Polling data received:', result);
+                const currentRate = result.conversion_rates[toCurrency.value];
+                if (currentRate >= targetRate) {
+                    alert(`Target rate of ${targetRate} reached: 1 ${fromCurrency.value} = ${currentRate} ${toCurrency.value}`);
+                    clearInterval(interval);
+                }
+            });
     }, 60000); // Poll every minute
 }
 
@@ -149,53 +209,41 @@ paypal.Buttons({
     }
 }).render('#paypal-button-container');
 
-// Spending Analysis with Chart.js
-var ctx = document.getElementById('spendingChart').getContext('2d');
-console.log('Rendering spending chart');
-var spendingChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ['January', 'February', 'March', 'April', 'May'],
-        datasets: [{
-            label: 'Spending in USD',
-            data: [120, 90, 150, 180, 110],
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 2
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+// News API for Educational Resources with Categories and Carousel
+const newsCategories = ['forex', 'crypto', 'commodities', 'bonds', 'banking', 'regulation', 'macroeconomics', 'fintech'];
+const apiKeyNews = '5ed6bdf83c124c429f912406482f0aae'; // Your actual News API key
+
+function fetchNews(category, containerId) {
+    let url = `https://newsapi.org/v2/everything?q=${category}&apiKey=${apiKeyNews}`;
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log(`${category} News data received:`, data);
+            let articles = data.articles;
+            let newsSection = document.getElementById(containerId);
+            newsSection.innerHTML = ''; // Clear previous news
+            articles.forEach(article => {
+                let articleElem = `<div class="news-item bg-gray-700 p-4 rounded-lg">
+                    <h3 class="font-semibold text-lg">${
+                        article.title}</h3>
+                        <p class="mt-2 text-sm">${article.description || 'No description available'}</p>
+                        <a href="${article.url}" target="_blank" class="mt-2 text-blue-500 underline block">Read more</a>
+                    </div>`;
+                    newsSection.innerHTML += articleElem;
+                });
+            })
+            .catch(error => {
+                console.error(`Error fetching ${category} news:`, error);
+                document.getElementById(containerId).innerText = `Error fetching ${category} news. Please try again later.`;
+            });
     }
-});
-
-// News API for Educational Resources
-fetch('https://newsapi.org/v2/everything?q=forex&apiKey=5ed6bdf83c124c429f912406482f0aae') // Use your NewsAPI key
-    .then(response => response.json())
-    .then(data => {
-        console.log('News data received:', data);
-        let articles = data.articles;
-        let newsSection = document.getElementById('news-section');
-        articles.forEach(article => {
-            let articleElem = `<div class="article mt-4">
-                <h3 class="font-semibold">${article.title}</h3>
-                <p>${article.description}</p>
-                <a href="${article.url}" target="_blank" class="text-blue-500 underline">Read more</a>
-            </div>`;
-            newsSection.innerHTML += articleElem;
+    
+    // Load news for each category
+    newsCategories.forEach(category => fetchNews(category, `${category}-news`));
+    
+    // Service Worker for Offline Mode
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').then(() => {
+            console.log('Service Worker Registered');
         });
-    })
-    .catch(error => {
-        console.error('Error fetching news:', error);
-        document.getElementById('news-section').innerText = "Error fetching news. Please try again later.";
-    });
-
-// Service Worker for Offline Mode
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js').then(() => {
-        console.log('Service Worker Registered');
-    });
-}
+    }
