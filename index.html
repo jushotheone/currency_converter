@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter with Multi-Features</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Adding glowing effect for buttons */
+        .glow {
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .section-header {
+            background: linear-gradient(90deg, rgba(52, 152, 219, 1) 0%, rgba(155, 89, 182, 1) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+    <script defer src="country_list.js"></script>
+    <script defer src="script.js"></script>
+</head>
+
+<body class="bg-gray-900 text-gray-200 font-sans">
+
+    <div class="container mx-auto p-6 max-w-2xl">
+        <header class="text-center text-4xl font-bold mb-6 section-header">Currency Converter</header>
+
+        <!-- Core Conversion Form -->
+        <form action="#" class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <div class="mb-4">
+                <label for="amount" class="block text-lg font-semibold mb-2">Amount</label>
+                <input type="number" id="amount" class="w-full p-4 border-none rounded-lg bg-gray-700 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Amount">
+            </div>
+
+            <div class="form-group grid grid-cols-3 gap-4 mb-4">
+                <div class="from">
+                    <p class="text-sm font-semibold mb-2">From</p>
+                    <div class="select-box flex items-center relative">
+                        <img src="https://flagsapi.com/GB/flat/64.png" alt="flagsapi" class="w-8 h-8 mr-2 absolute left-4 top-1/2 transform -translate-y-1/2">
+                        <select class="from-currency w-full p-4 border-none rounded-lg bg-gray-700 text-gray-200 pl-16 focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                    </div>
+                </div>
+
+                <div class="icon flex justify-center items-center text-2xl text-blue-500">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+
+                <div class="to">
+                    <p class="text-sm font-semibold mb-2">To</p>
+                    <div class="select-box flex items-center relative">
+                        <img src="https://flagsapi.com/US/flat/64.png" alt="flagsapi" class="w-8 h-8 mr-2 absolute left-4 top-1/2 transform -translate-y-1/2">
+                        <select class="to-currency w-full p-4 border-none rounded-lg bg-gray-700 text-gray-200 pl-16 focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="exchange-rate text-center text-2xl font-semibold text-cyan-500 mb-4">Receiving exchange rate...</div>
+
+            <div>
+                <button type="submit" class="w-full py-4 bg-cyan-500 text-white rounded-lg text-xl glow hover:bg-cyan-400 focus:outline-none transition duration-300">Convert</button>
+            </div>
+        </form>
+
+        <!-- Custom Alerts Section -->
+        <div class="form-group mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
+            <input type="number" id="alertRate" class="w-full p-4 border-none rounded-lg bg-gray-700 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 mb-2" placeholder="Set alert rate">
+            <button id="setAlert" class="w-full py-4 bg-green-500 text-white rounded-lg text-xl glow hover:bg-green-400 focus:outline-none transition duration-300">Set Alert</button>
+        </div>
+
+        <!-- Wallet Display Section -->
+        <div class="wallet-display mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-semibold mb-4">Your Wallet</h3>
+            <div class="bg-gray-700 text-gray-200 rounded-lg p-4">
+                <!-- Wallet Data Loaded Here -->
+                GBP: 500
+            </div>
+        </div>
+
+        <!-- PayPal Integration -->
+        <div id="paypal-button-container" class="mt-6"></div>
+
+        <!-- Chart for Spending Analysis -->
+        <div class="mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-semibold mb-4">Spending Analysis</h3>
+            <canvas id="spendingChart"></canvas>
+        </div>
+
+        <!-- Educational News Section -->
+        <div id="news-section" class="mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-semibold mb-4">Latest Forex News</h3>
+            <div class="space-y-4">
+                <!-- News Data Loaded Here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts for PayPal and Chart.js -->
+    <!-- Replace YOUR_PAYPAL_CLIENT_ID with your actual PayPal Client ID -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AZDOafofFGDLWjkG-EpVGNfhsn4qTzdtQt5dqvEXpXSk1Jb-TkALVJgREkx7rL-_rC7bZA26ZnNwGF1X"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+
+</html>
