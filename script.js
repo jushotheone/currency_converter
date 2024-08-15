@@ -86,30 +86,32 @@ function getExchangeRate() {
             console.error('Error in fetch operation:', error);
             exchangeRateText.innerText = "Something went wrong. Please try again later";
         });
-}function getHistoricalData() {
-    const apiKey = "dcb063aad8ea4242a6e32141"; // Your actual API Key
-    const currency = fromCurrency.value;
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - 6); // Fetch 6 months of historical data
+}
 
-    const startDateString = startDate.toISOString().split('T')[0]; // Format date
-    const endDateString = endDate.toISOString().split('T')[0];
+// Fetch Historical Data
+function getExchangeRate() {
+    const amount = document.querySelector("#amount").value || 1;
+    const exchangeRateText = document.querySelector(".exchange-rate");
+    exchangeRateText.innerText = "Receiving exchange rate...";
 
-    // Using Thingproxy free proxy
-    let corsProxy = 'https://thingproxy.freeboard.io/fetch/';
-    let url = `${corsProxy}https://v6.exchangerate-api.com/v6/${apiKey}/history/${currency}?start_date=${startDateString}&end_date=${endDateString}`;
+    const baseCurrency = fromCurrency.value;
+    const targetCurrency = toCurrency.value;
 
-    fetch(url)
+    fetch(`/.netlify/functions/getExchangeRates?baseCurrency=${baseCurrency}&targetCurrency=${targetCurrency}`)
         .then(response => response.json())
-        .then(data => {
-            if (data.result === 'success') {
-                updateChart(data.conversion_rates);
+        .then(result => {
+            if (result.conversion_rate) {
+                let exchangeRate = result.conversion_rate;
+                let totalExchangeRate = (amount * exchangeRate).toFixed(2);
+                exchangeRateText.innerText = `${amount} ${baseCurrency} = ${totalExchangeRate} ${targetCurrency}`;
             } else {
-                console.error("Failed to fetch historical data:", data);
+                exchangeRateText.innerText = "Something went wrong. Please try again later";
             }
         })
-        .catch(error => console.error("Error fetching historical data:", error));
+        .catch(error => {
+            console.error('Error in fetch operation:', error);
+            exchangeRateText.innerText = "Something went wrong. Please try again later";
+        });
 }
 
 
