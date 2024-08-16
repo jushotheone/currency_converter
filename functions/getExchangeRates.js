@@ -1,26 +1,17 @@
-// getExchangeRates.js
-const fetch = require('node-fetch'); // Using node-fetch to make server-side requests
-
 exports.handler = async function (event, context) {
     const { baseCurrency, targetCurrency } = event.queryStringParameters;
-    const apiKey = "your_exchange_rate_api_key_here";
+    const apiKey = "dcb063aad8ea4242a6e32141";
     const url = `https://v6.exchangerate-api.com/v6/${apiKey}/pair/${baseCurrency}/${targetCurrency}`;
 
     try {
-        const response = await fetch(url);
+        const fetch = await import('node-fetch');
+        const response = await fetch.default(url);
         const data = await response.json();
 
-        if (response.ok) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify(data),
-            };
-        } else {
-            return {
-                statusCode: response.status,
-                body: JSON.stringify({ error: data.error }),
-            };
-        }
+        return {
+            statusCode: 200,
+            body: JSON.stringify(data),
+        };
     } catch (error) {
         return {
             statusCode: 500,
