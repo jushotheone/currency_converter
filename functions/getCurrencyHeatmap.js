@@ -1,7 +1,7 @@
+// getCurrencyHeatmap.js
 exports.handler = async function (event, context) {
-    const { baseCurrency, targetCurrency } = event.queryStringParameters;
-    const apiKey = "dcb063aad8ea4242a6e32141"; // Your ExchangeRate-API key
-    const url = `https://v6.exchangerate-api.com/v6/${apiKey}/pair/${baseCurrency}/${targetCurrency}`;
+    const apiKey = "N0YQFQC35RNK8WHE";
+    const url = `https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=USD&to_symbol=EUR&interval=5min&apikey=${apiKey}`;
 
     try {
         const fetch = await import('node-fetch');
@@ -15,7 +15,7 @@ exports.handler = async function (event, context) {
     } catch (error) {
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: "Failed to fetch data" }),
+            body: JSON.stringify({ error: "Failed to fetch real-time currency heatmap data" }),
         };
     }
 };

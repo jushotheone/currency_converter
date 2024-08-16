@@ -1,7 +1,7 @@
+// getInterestRates.js
 exports.handler = async function (event, context) {
-    const { baseCurrency, targetCurrency } = event.queryStringParameters;
-    const apiKey = "dcb063aad8ea4242a6e32141"; // Your ExchangeRate-API key
-    const url = `https://v6.exchangerate-api.com/v6/${apiKey}/pair/${baseCurrency}/${targetCurrency}`;
+    const apiKey = "28fd8c4619114fb:r2dx8rjei7ddd6t";
+    const url = `https://api.tradingeconomics.com/country?c=${apiKey}&f=json`;
 
     try {
         const fetch = await import('node-fetch');
@@ -15,7 +15,7 @@ exports.handler = async function (event, context) {
     } catch (error) {
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: "Failed to fetch data" }),
+            body: JSON.stringify({ error: "Failed to fetch interest/inflation rates" }),
         };
     }
 };
