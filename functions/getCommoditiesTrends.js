@@ -14,11 +14,18 @@ exports.handler = async function (event, context) {
             };
         }
 
+        // Send only relevant data back (e.g., date and values)
+        const commoditiesData = data.dataset.data.map(item => ({
+            date: item[0],   // Assuming the first index is the date
+            value: item[1],  // Assuming the second index is the value of the commodity
+        }));
+
         return {
             statusCode: 200,
-            body: JSON.stringify(data.dataset.data),
+            body: JSON.stringify(commoditiesData),
         };
     } catch (error) {
+        console.error("Error fetching commodities data:", error);
         return {
             statusCode: 500,
             body: JSON.stringify({ error: "Server Error: " + error.message }),

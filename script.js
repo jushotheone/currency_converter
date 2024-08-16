@@ -155,12 +155,19 @@ function renderHeatmap(data) {
 }
 
 // 3. Top Gainers and Losers
+// 3. Top Gainers and Losers
 function fetchGainersLosers() {
     fetch(`/.netlify/functions/getGainersLosers`)
         .then(response => response.json())
         .then(result => {
             console.log("Gainers and Losers Data:", result);
-            renderGainersLosersChart(result);
+
+            // Check if result is an array
+            if (Array.isArray(result)) {
+                renderGainersLosersChart(result);
+            } else {
+                console.error("Data is not an array", result);
+            }
         })
         .catch(error => {
             console.error('Error fetching gainers and losers data:', error);
@@ -168,9 +175,15 @@ function fetchGainersLosers() {
 }
 
 function renderGainersLosersChart(data) {
+    // Ensure data is valid and contains expected fields
+    if (!data || data.length === 0) {
+        console.error("No data available to render gainers and losers chart.");
+        return;
+    }
+
     const ctx = document.getElementById('currencyMoversChart').getContext('2d');
-    const labels = data.map(item => item.currency);
-    const values = data.map(item => item.percentageChange);
+    const labels = data.map(item => item.currency || 'Unknown');
+    const values = data.map(item => item.percentageChange || 0);
 
     if (gainersLosersChart) {
         gainersLosersChart.destroy();
