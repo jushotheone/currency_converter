@@ -6,14 +6,8 @@ const formgroup = document.querySelectorAll(".form-group select"),
 
 let currencyStrengthChart, heatmapChart, gainersLosersChart, commoditiesChart, interestRatesChart, newsSentimentChart;
 
-console.log('Form group elements:', formgroup);
-console.log('From Currency element:', fromCurrency);
-console.log('To Currency element:', toCurrency);
-console.log('Get button element:', getButton);
-
 // Load all currencies dynamically from country_list.js
 for (let i = 0; i < formgroup.length; i++) {
-    console.log(`Loading currencies into form group ${i}`);
     for (let currency_code in country_code) {
         let selected;
         if (i === 0) selected = currency_code === "GBP" ? "selected" : "";
@@ -24,7 +18,6 @@ for (let i = 0; i < formgroup.length; i++) {
 
     // Add event listener to load the correct flag when the currency changes
     formgroup[i].addEventListener("change", function () {
-        console.log(`Currency changed in group ${i}:`, this.value);
         loadFlag(this);
     });
 }
@@ -37,16 +30,13 @@ function loadFlag(element) {
     if (imgTag && country_code[currencyCode]) {
         const countryCode = country_code[currencyCode];
         imgTag.src = `https://flagsapi.com/${countryCode}/flat/64.png`;
-        console.log(`Flag updated for currency ${currencyCode}: ${imgTag.src}`);
     } else {
-        console.warn(`No flag available for currency: ${currencyCode}`);
-        imgTag.src = ''; // Optionally hide or remove the image
+        imgTag.src = ''; // Optionally hide or remove the image if no flag available
     }
 }
 
 // Call loadFlag on page load to set the initial flags
 window.addEventListener("load", () => {
-    console.log('Page loaded, setting initial flags and fetching data.');
     loadFlag(fromCurrency);
     loadFlag(toCurrency);
     fetchCurrencyStrength(); // Fetch currency strength data
@@ -60,7 +50,6 @@ window.addEventListener("load", () => {
 // Handle Conversion Event
 getButton.addEventListener("click", e => {
     e.preventDefault();
-    console.log('Convert button clicked.');
     fetchExchangeRate(); // Fetch exchange rate
 });
 
@@ -73,52 +62,32 @@ function fetchExchangeRate() {
     const baseCurrency = fromCurrency.value;
     const targetCurrency = toCurrency.value;
 
-    console.log(`Fetching exchange rate for ${baseCurrency} to ${targetCurrency} with amount ${amount}`);
-
     const url = `/.netlify/functions/getExchangeRates?baseCurrency=${baseCurrency}&targetCurrency=${targetCurrency}`;
-    console.log(`[Exchange Rate] Fetch URL: ${url}`);
 
     fetch(url)
         .then(response => {
-            console.log(`[Exchange Rate] Response status: ${response.status}, Response status text: ${response.statusText}`);
             if (!response.ok) {
                 throw new Error(`Network response was not ok: ${response.statusText}`);
             }
             return response.json();
         })
         .then(result => {
-            console.log("Exchange rate API response:", result);
             if (result.conversion_rate) {
                 const exchangeRate = result.conversion_rate;
                 const totalExchangeRate = (amount * exchangeRate).toFixed(2);
                 exchangeRateText.innerText = `${amount} ${baseCurrency} = ${totalExchangeRate} ${targetCurrency}`;
             } else {
                 exchangeRateText.innerText = "Failed to retrieve the exchange rate. Please try again later.";
-                console.error("Missing conversion_rate in API response:", result);
             }
         })
         .catch(error => {
-            console.error('[Exchange Rate] Error in fetch operation:', error);
             exchangeRateText.innerText = `Error: ${error.message}. Please check your internet connection or try again later.`;
         });
 }
 
-// Fetch and render Currency Strength
+// Fetch and cache Currency Strength data
 function fetchCurrencyStrength() {
-    console.log(`[Currency Strength] Fetching data...`);
-    fetch(`/.netlify/functions/getCurrencyStrength`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch currency strength');
-            }
-            return response.json();
-        })
-        .then(data => {
-            renderCurrencyStrengthChart(data);
-        })
-        .catch(error => {
-            console.error('Error fetching currency strength:', error);
-        });
+    fetchDataWithCache('/.netlify/functions/getCurrencyStrength', 'currencyStrength', renderCurrencyStrengthChart);
 }
 
 function renderCurrencyStrengthChart(data) {
@@ -149,22 +118,9 @@ function renderCurrencyStrengthChart(data) {
     });
 }
 
-// Fetch and render Currency Heatmap
+// Fetch and cache Currency Heatmap data
 function fetchCurrencyHeatmap() {
-    console.log(`[Currency Heatmap] Fetching data...`);
-    fetch(`/.netlify/functions/getCurrencyHeatmap`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch currency heatmap');
-            }
-            return response.json();
-        })
-        .then(result => {
-            renderHeatmap(result);
-        })
-        .catch(error => {
-            console.error('[Currency Heatmap] Error fetching data:', error);
-        });
+    fetchDataWithCache('/.netlify/functions/getCurrencyHeatmap', 'currencyHeatmap', renderHeatmap);
 }
 
 function renderHeatmap(data) {
@@ -180,26 +136,9 @@ function renderHeatmap(data) {
     }
 }
 
-// Fetch and render Gainers and Losers
+// Fetch and cache Gainers and Losers data
 function fetchGainersLosers() {
-    console.log(`[Gainers and Losers] Fetching data...`);
-    fetch(`/.netlify/functions/getGainersLosers`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch gainers and losers');
-            }
-            return response.json();
-        })
-        .then(result => {
-            if (Array.isArray(result)) {
-                renderGainersLosersChart(result);
-            } else {
-                console.error("[Gainers and Losers] Data is not an array", result);
-            }
-        })
-        .catch(error => {
-            console.error('[Gainers and Losers] Error fetching data:', error);
-        });
+    fetchDataWithCache('/.netlify/functions/getGainersLosers', 'gainersLosers', renderGainersLosersChart);
 }
 
 function renderGainersLosersChart(data) {
@@ -231,23 +170,9 @@ function renderGainersLosersChart(data) {
     });
 }
 
-// Fetch and render Commodities Price Trends
+// Fetch and cache Commodities Trends data
 function fetchCommoditiesTrends() {
-    console.log(`[Commodities Trends] Fetching data...`);
-    fetch(`/.netlify/functions/getCommoditiesTrends`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch commodities trends');
-            }
-            return response.json();
-        })
-        .then(result => {
-            renderCommoditiesChart(result);
-        })
-        .catch(error => {
-            console.error('[Commodities Trends] Error fetching data:', error);
-            document.getElementById('commoditiesChart').innerText = "Failed to load commodity trends data.";
-        });
+    fetchDataWithCache('/.netlify/functions/getCommoditiesTrends', 'commoditiesTrends', renderCommoditiesChart);
 }
 
 function renderCommoditiesChart(data) {
@@ -278,22 +203,9 @@ function renderCommoditiesChart(data) {
     });
 }
 
-// Fetch and render Country-Specific Inflation/Interest Rates
+// Fetch and cache Interest Rates data
 function fetchInterestRates() {
-    console.log(`[Interest Rates] Fetching data...`);
-    fetch(`/.netlify/functions/getInterestRates`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch interest rates');
-            }
-            return response.json();
-        })
-        .then(result => {
-            renderInterestRatesChart(result);
-        })
-        .catch(error => {
-            console.error('[Interest Rates] Error fetching data:', error);
-        });
+    fetchDataWithCache('/.netlify/functions/getInterestRates', 'interestRates', renderInterestRatesChart);
 }
 
 function renderInterestRatesChart(data) {
@@ -325,61 +237,15 @@ function renderInterestRatesChart(data) {
     });
 }
 
-// Forex News Sentiment Analysis with retries
-function showLoadingSpinner() {
-    const spinner = document.getElementById('loadingSpinner');
-    if (spinner) {
-        spinner.style.display = 'block';
-    } else {
-        console.warn('Loading spinner element not found.');
-    }
-}
-
-function hideLoadingSpinner() {
-    const spinner = document.getElementById('loadingSpinner');
-    if (spinner) {
-        spinner.style.display = 'none';
-    } else {
-        console.warn('Loading spinner element not found.');
-    }
-}
-
+// Forex News Sentiment Analysis with retries and caching
 function fetchNewsSentiment(retries = 3, delay = 2000) {
-    console.log(`[News Sentiment] Fetching data with retries...`);
-    showLoadingSpinner(); // Start spinner
-
-    fetch('/.netlify/functions/getNewsSentiment')
-        .then(response => {
-            console.log(`[News Sentiment] Response status: ${response.status}, Response status text: ${response.statusText}`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch forex news sentiment data.");
-            }
-            return response.json();
-        })
-        .then(result => {
-            hideLoadingSpinner(); // Hide spinner on success
-            console.log("Forex News Sentiment Data:", result);
-            renderNewsSentimentChart(result);
-        })
-        .catch(error => {
-            if (retries > 0) {
-                console.warn(`[News Sentiment] Retrying sentiment data fetch... (${retries} retries left). Error: ${error.message}`);
-                setTimeout(() => fetchNewsSentiment(retries - 1, delay), delay);
-            } else {
-                hideLoadingSpinner(); // Hide spinner if all retries fail
-                console.error('[News Sentiment] Error fetching data after retries:', error);
-                document.getElementById('newsSentimentChart').innerText = "Failed to load news sentiment data.";
-            }
-        });
+    fetchDataWithCache('/.netlify/functions/getNewsSentiment', 'newsSentiment', renderNewsSentimentChart, retries, delay);
 }
 
 function renderNewsSentimentChart(data) {
     const ctx = document.getElementById('newsSentimentChart').getContext('2d');
     const labels = ['Positive', 'Neutral', 'Negative'];
     const sentimentCounts = [data.positive, data.neutral, data.negative];
-
-    const backgroundColors = ['rgba(75, 192, 192, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(255, 99, 132, 0.6)'];
-    const borderColors = ['rgba(75, 192, 192, 1)', 'rgba(255, 206, 86, 1)', 'rgba(255, 99, 132, 1)'];
 
     if (newsSentimentChart) {
         newsSentimentChart.destroy();
@@ -389,20 +255,17 @@ function renderNewsSentimentChart(data) {
         type: 'doughnut',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Forex News Sentiment',
+            datasets: [{                label: 'Forex News Sentiment',
                 data: sentimentCounts,
-                backgroundColor: backgroundColors,
-                borderColor: borderColors,
+                backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(255, 99, 132, 0.6)'],
+                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 206, 86, 1)', 'rgba(255, 99, 132, 1)'],
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    position: 'top',
-                },
+                legend: { position: 'top' },
                 tooltip: {
                     callbacks: {
                         label: function (context) {
@@ -417,17 +280,47 @@ function renderNewsSentimentChart(data) {
     });
 }
 
-// Initiate the fetching process for news sentiment
-fetchNewsSentiment();
+// Function to fetch data with caching and retries
+function fetchDataWithCache(url, cacheKey, renderFunction, retries = 3, delay = 2000) {
+    const cache = JSON.parse(localStorage.getItem(cacheKey));
+
+    if (cache) {
+        console.log(`[${cacheKey}] Loading from cache`);
+        renderFunction(cache);
+        return;
+    }
+
+    const fetchWithRetries = (retryCount) => {
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${cacheKey}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                localStorage.setItem(cacheKey, JSON.stringify(data));
+                renderFunction(data);
+            })
+            .catch(error => {
+                if (retryCount > 0) {
+                    console.warn(`[${cacheKey}] Retrying fetch... (${retryCount} retries left)`);
+                    setTimeout(() => fetchWithRetries(retryCount - 1), delay);
+                } else {
+                    console.error(`[${cacheKey}] Failed to fetch data after retries: ${error.message}`);
+                }
+            });
+    };
+
+    fetchWithRetries(retries);
+}
 
 // PayPal Integration
 paypal.Buttons({
     createOrder: function (data, actions) {
         return actions.order.create({
             purchase_units: [{
-                amount: {
-                    value: '10.00' // Replace this with the dynamic value if needed
-                }
+                amount: { value: '10.00' }
             }]
         });
     },
@@ -440,7 +333,6 @@ paypal.Buttons({
 
 // Store and Retrieve Multi-Currency Wallet
 function storeInWallet(currency, amount) {
-    console.log(`Storing in wallet: ${currency}, amount: ${amount}`);
     let wallet = JSON.parse(localStorage.getItem('multiCurrencyWallet')) || {};
     wallet[currency] = (wallet[currency] || 0) + parseFloat(amount);
     localStorage.setItem('multiCurrencyWallet', JSON.stringify(wallet));
@@ -448,7 +340,6 @@ function storeInWallet(currency, amount) {
 
 function displayWallet() {
     let wallet = JSON.parse(localStorage.getItem('multiCurrencyWallet')) || {};
-    console.log('Displaying wallet:', wallet);
     let walletDisplay = document.querySelector('.wallet-display');
     walletDisplay.innerHTML = Object.entries(wallet)
         .map(([currency, amount]) => `${currency}: ${amount}`)
@@ -461,21 +352,22 @@ displayWallet();
 const newsCategories = ['forex', 'crypto', 'commodities', 'bonds', 'banking', 'regulation', 'macroeconomics', 'fintech'];
 
 function fetchNews(category, containerId) {
-    console.log(`[News API] Fetching news for category: ${category}`);
-    let url = `https://newsapi.org/v2/everything?q=${category}&apiKey=5ed6bdf83c124c429f912406482f0aae`;
+    const url = `https://newsapi.org/v2/everything?q=${category}&apiKey=5ed6bdf83c124c429f912406482f0aae`;
 
     fetch(url)
         .then(response => {
-            console.log(`[News API] Response status for category ${category}: ${response.status}, Response status text: ${response.statusText}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch news for category ${category}: ${response.statusText}`);
+            }
             return response.json();
         })
         .then(data => {
-            console.log(`[News API] Data for category ${category}:`, data);
-            let articles = data.articles;
-            let newsSection = document.getElementById(containerId);
+            const articles = data.articles;
+            const newsSection = document.getElementById(containerId);
             newsSection.innerHTML = ''; // Clear previous news
             articles.forEach(article => {
-                let articleElem = `<div class="news-item bg-gray-700 p-4 rounded-lg">
+                const articleElem = `
+                <div class="news-item bg-gray-700 p-4 rounded-lg">
                     <h3 class="font-semibold text-lg">${article.title}</h3>
                     <p class="mt-2 text-sm">${article.description || 'No description available'}</p>
                     <a href="${article.url}" target="_blank" class="mt-2 text-blue-500 underline block">Read more</a>
@@ -484,7 +376,7 @@ function fetchNews(category, containerId) {
             });
         })
         .catch(error => {
-            console.error(`[News API] Error fetching news for category ${category}:`, error);
+            console.error(`[News API] Error fetching news for category ${category}: ${error.message}`);
         });
 }
 
