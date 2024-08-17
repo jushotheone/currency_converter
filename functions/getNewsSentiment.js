@@ -18,12 +18,11 @@ async function fetchSentimentWithRetry(articleDescription, retries = 3, delay = 
         );
     } catch (error) {
         if (retries > 0) {
-            console.warn(`Retrying sentiment analysis... (${retries} retries left)`);
-            return new Promise((resolve) =>
-                setTimeout(() => resolve(fetchSentimentWithRetry(articleDescription, retries - 1, delay)), delay)
-            );
+            console.warn(`Retrying sentiment analysis... (${retries} retries left). Error: ${error.message}`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return fetchSentimentWithRetry(articleDescription, retries - 1, delay * 2); // Exponential backoff
         } else {
-            console.error(`Failed after retries: ${error.message}`, error.stack);  // Log detailed error
+            console.error(`Failed after retries: ${error.message}`);
             throw new Error(`Failed to analyze sentiment after multiple attempts: ${error.message}`);
         }
     }
@@ -32,7 +31,7 @@ async function fetchSentimentWithRetry(articleDescription, retries = 3, delay = 
 exports.handler = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false; // Prevent premature timeout
 
-    const startTime = Date.now(); // Start timer
+    const startTime = Date.now();
 
     try {
         // Fetch forex-related news articles from News API
@@ -63,11 +62,11 @@ exports.handler = async (event, context) => {
                     sentiment: sentimentResponse.data.type,
                 });
             } catch (sentimentError) {
-                console.error(`Error analyzing sentiment for article: ${article.title}`, sentimentError.message);
+                console.error(`Error analyzing sentiment for article: ${article.title}.`, sentimentError.message);
                 sentimentResults.push({
                     title: article.title,
                     description: article.description,
-                    sentiment: "error", 
+                    sentiment: "error",
                 });
             }
         }
@@ -82,16 +81,17 @@ exports.handler = async (event, context) => {
                 "Access-Control-Allow-Headers": "Content-Type",
                 "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
             },
-            body: JSON.stringify(sentimentResults)
+            body: JSON.stringify(sentimentResults),
         };
     } catch (error) {
-        console.error('Error fetching news or analyzing sentiment:', error.message, error.stack);  // Log full stack
+        console.error('Error fetching news or analyzing sentiment:', error.message);
+
         return {
             statusCode: 500,
             headers: {
                 "Access-Control-Allow-Origin": "*",
             },
-            body: JSON.stringify({ error: 'Failed to fetch or analyze sentiment data' })
+            body: JSON.stringify({ error: 'Failed to fetch or analyze sentiment data' }),
         };
     }
 };

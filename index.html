@@ -235,70 +235,70 @@
                     <canvas id="inflationInterestChart"></canvas>
                 </div>
                 <div class="bg-gray-800 p-6 rounded-lg shadow-lg chart-container">
-                    <h3 class="text-lg font-semibold mb-4">Real-Time Currency Exchange Heatmap</h3>
-                    <div id="currencyHeatmap"></div>
-                </div>
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg chart-container">
-                    <h3 class="text-lg font-semibold mb-4">Forex News Sentiment Analysis</h3>
-                    <canvas id="newsSentimentChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- News Section -->
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg mt-6">
-            <h3 class="text-lg font-semibold mb-4">Latest News by Category</h3>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <h4 class="text-2xl text-cyan-400 mb-4">Forex</h4>
-                    <div class="news-carousel space-x-4" id="forex-news"></div>
-                </div>
-                <div>
-                    <h4 class="text-2xl text-green-400 mb-4">Crypto</h4>
-                    <div class="news-carousel space-x-4" id="crypto-news"></div>
-                </div>
-                <div>
-                    <h4 class="text-2xl text-yellow-400 mb-4">Commodities</h4>
-                    <div class="news-carousel space-x-4" id="commodities-news"></div>
-                </div>
-                <div>
-                    <h4 class="text-2xl text-blue-400 mb-4">Stocks</h4>
-                    <div class="news-carousel space-x-4" id="stocks-news"></div>
-                </div>
-                <div>
-                    <h4 class="text-2xl text-purple-400 mb-4">Bonds</h4>
-                    <div class="news-carousel space-x-4" id="bonds-news"></div>
-                </div>
-                <div>
-                    <h4 class="text-2xl text-red-400 mb-4">Banking</h4>
-                    <div class="news-carousel space-x-4" id="banking-news"></div>
-                </div>
-                <div>
-                    <h4 class="text-2xl text-pink-400 mb-4">Regulation</h4>
-                    <div class="news-carousel space-x-4" id="regulation-news"></div>
-                </div>
-                <div>
-                    <h4 class="text-2xl text-orange-400 mb-4">Macroeconomics</h4>
-                    <div class="news-carousel space-x-4" id="macroeconomics-news"></div>
-                </div>
-                <div>
-                    <h4 class="text-2xl text-indigo-400 mb-4">Fintech</h4>
-                    <div class="news-carousel space-x-4" id="fintech-news"></div>
+                    <h3 class="text-lg font-semibold mb-4">Real-Time Currency Exchange Heatmap</h
+                        <div id="currencyHeatmap"></div>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg chart-container">
+                        <h3 class="text-lg font-semibold mb-4">Forex News Sentiment Analysis</h3>
+                        <canvas id="newsSentimentChart"></canvas>
+                    </div>
                 </div>
             </div>
+    
+            <!-- News Section -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg mt-6">
+                <h3 class="text-lg font-semibold mb-4">Latest News by Category</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="text-2xl text-cyan-400 mb-4">Forex</h4>
+                        <div class="news-carousel space-x-4" id="forex-news"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl text-green-400 mb-4">Crypto</h4>
+                        <div class="news-carousel space-x-4" id="crypto-news"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl text-yellow-400 mb-4">Commodities</h4>
+                        <div class="news-carousel space-x-4" id="commodities-news"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl text-blue-400 mb-4">Stocks</h4>
+                        <div class="news-carousel space-x-4" id="stocks-news"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl text-purple-400 mb-4">Bonds</h4>
+                        <div class="news-carousel space-x-4" id="bonds-news"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl text-red-400 mb-4">Banking</h4>
+                        <div class="news-carousel space-x-4" id="banking-news"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl text-pink-400 mb-4">Regulation</h4>
+                        <div class="news-carousel space-x-4" id="regulation-news"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl text-orange-400 mb-4">Macroeconomics</h4>
+                        <div class="news-carousel space-x-4" id="macroeconomics-news"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl text-indigo-400 mb-4">Fintech</h4>
+                        <div class="news-carousel space-x-4" id="fintech-news"></div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Loading Spinner for News Sentiment Analysis -->
+            <div id="loadingSpinner" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style="display: none;">
+                <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-white"></div>
+            </div>
         </div>
-
-        <!-- Loading Spinner for News Sentiment Analysis -->
-        <div id="loadingSpinner" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style="display: none;">
-            <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-white"></div>
-        </div>
-    </div>
-
-    <!-- Scripts for FontAwesome, PayPal, Chart.js, and other visualizations -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=AZDOafofFGDLWjkG-EpVGNfhsn4qTzdtQt5dqvEXpXSk1Jb-TkALVJgREkx7rL-_rC7bZA26ZnNwGF1X"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script defer src="script.js"></script>
-</body>
-
-</html>
+    
+        <!-- Scripts for FontAwesome, PayPal, Chart.js, and other visualizations -->
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+        <script src="https://www.paypal.com/sdk/js?client-id=AZDOafofFGDLWjkG-EpVGNfhsn4qTzdtQt5dqvEXpXSk1Jb-TkALVJgREkx7rL-_rC7bZA26ZnNwGF1X"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script defer src="script.js"></script>
+    </body>
+    
+    </html>
