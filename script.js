@@ -155,7 +155,6 @@ function renderHeatmap(data) {
 }
 
 // 3. Top Gainers and Losers
-// 3. Top Gainers and Losers
 function fetchGainersLosers() {
     fetch(`/.netlify/functions/getGainersLosers`)
         .then(response => response.json())
@@ -280,7 +279,7 @@ function renderInterestRatesChart(data) {
                 label: 'Interest/Inflation Rates (%)',
                 data: rates,
                 backgroundColor: 'rgba(255, 159, 64, 0.6)',
-                borderColor:                'rgba(255, 159, 64, 1)',
+                borderColor: 'rgba(255, 159, 64, 1)',
                 borderWidth: 1
             }]
         },
