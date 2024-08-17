@@ -4,31 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Currency Converter Dashboard</title>
+    <title>Quantro: Currency Converter Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
+        /* Glow effect around interactive buttons */
         .glow {
             box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
         }
 
+        /* Section header gradient effect */
         .section-header {
             background: linear-gradient(90deg, rgba(52, 152, 219, 1) 0%, rgba(155, 89, 182, 1) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
+        /* Grid layout for larger screens */
         .grid-layout {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: repeat(3, minmax(300px, 1fr));
             gap: 1.5rem;
-            height: auto;
+            margin-bottom: 2rem;
         }
 
-        .grid-layout > div {
-            height: auto;
-            overflow-y: auto;
+        /* Chart container consistent height */
+        .chart-container {
+            min-height: 300px;
+            padding: 1rem;
         }
 
+        /* News carousel style */
         .news-carousel {
             display: flex;
             overflow-x: auto;
@@ -45,16 +50,80 @@
             margin-right: 20px;
         }
 
-        /* Chart Containers' consistent height */
-        .chart-container {
-            min-height: 300px;
-        }
-
-        /* TailwindCSS Fix for mobile responsiveness */
+        /* Media queries for responsiveness */
         @media (max-width: 768px) {
             .grid-layout {
                 grid-template-columns: 1fr;
             }
+        }
+
+        /* Custom styles for currency select box */
+        .custom-select {
+            display: flex;
+            align-items: center;
+            background-color: #374151;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            position: relative;
+        }
+
+        /* Flag and select container */
+        .custom-select img {
+            width: 32px;
+            height: 32px;
+            margin-right: 0.75rem;
+            border-radius: 0.25rem;
+        }
+
+        .custom-select select {
+            appearance: none;
+            background: none;
+            border: none;
+            color: #D1D5DB;
+            font-size: 1rem;
+            font-weight: 600;
+            flex: 1;
+            padding-right: 1.5rem;
+        }
+
+        /* Dropdown arrow using FontAwesome */
+        .custom-select:after {
+            content: '\f0d7';
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #9CA3AF;
+        }
+
+        /* Animated swap icon */
+        .icon:hover {
+            animation: spin 0.5s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Glowing and animated button on hover */
+        .btn-animate:hover {
+            transform: scale(1.05);
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Convert button glow */
+        .convert-btn {
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .convert-btn:hover {
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.7);
         }
     </style>
     <script defer src="country_list.js"></script>
@@ -62,63 +131,88 @@
 </head>
 
 <body class="bg-gray-900 text-gray-200 font-sans">
-
     <div class="container mx-auto p-6">
+        <!-- Header with Gradient effect (Point 1) -->
         <header class="text-center text-5xl font-bold mb-8 section-header">
-            Currency Converter Dashboard
+            Quantro Dashboard
         </header>
 
         <div class="grid-layout">
             <!-- Currency Converter Section -->
             <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <!-- Section header with gradient and creative currency selector (Point 2) -->
                 <h2 class="text-center text-3xl font-bold mb-6 section-header">Currency Converter</h2>
                 <form action="#">
+                    <!-- Amount Input with focus effects (Point 6) -->
                     <div class="mb-4">
                         <label for="amount" class="block text-lg font-semibold mb-2">Amount</label>
                         <input type="number" id="amount" class="w-full p-4 border-none rounded-lg bg-gray-700 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Amount">
                     </div>
+
+                    <!-- Currency Selectors with glow and custom styles (Points 1, 2, 3) -->
                     <div class="form-group grid grid-cols-3 gap-4 mb-4">
+                        <!-- From Currency -->
                         <div class="from">
                             <p class="text-sm font-semibold mb-2">From</p>
-                            <div class="select-box flex items-center relative">
-                                <img src="https://flagsapi.com/GB/flat/64.png" alt="flagsapi" class="w-8 h-8 mr-2 absolute left-4 top-1/2 transform -translate-y-1/2">
-                                <select class="from-currency w-full p-4 border-none rounded-lg bg-gray-700 text-gray-200 pl-16 focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                            <div class="custom-select">
+                                <img src="https://flagsapi.com/GB/flat/64.png" alt="flag">
+                                <select class="from-currency">
+                                    <option value="GBP">GBP - British Pound</option>
+                                    <!-- dynamically loaded options -->
+                                </select>
                             </div>
                         </div>
+
+                        <!-- Swap Icon with animation (Point 3) -->
                         <div class="icon flex justify-center items-center text-3xl text-blue-500">
                             <i class="fas fa-sync-alt"></i>
                         </div>
+
+                        <!-- To Currency -->
                         <div class="to">
                             <p class="text-sm font-semibold mb-2">To</p>
-                            <div class="select-box flex items-center relative">
-                                <img src="https://flagsapi.com/US/flat/64.png" alt="flagsapi" class="w-8 h-8 mr-2 absolute left-4 top-1/2 transform -translate-y-1/2">
-                                <select class="to-currency w-full p-4 border-none rounded-lg bg-gray-700 text-gray-200 pl-16 focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                            <div class="custom-select">
+                                <img src="https://flagsapi.com/US/flat/64.png" alt="flag">
+                                <select class="to-currency">
+                                    <option value="USD">USD - US Dollar</option>
+                                    <!-- dynamically loaded options -->
+                                </select>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Conversion Result with glow (Point 5) -->
                     <div class="exchange-rate text-center text-2xl font-semibold text-cyan-500 mb-4">
                         Receiving exchange rate...
                     </div>
-                    <button type="submit" class="w-full py-4 bg-cyan-500 text-white rounded-lg text-xl glow hover:bg-cyan-400 focus:outline-none transition duration-300">
+
+                    <!-- Convert Button with glowing effect (Point 4) -->
+                    <button type="submit" class="w-full py-4 bg-cyan-500 text-white rounded-lg text-xl glow convert-btn hover:bg-cyan-400 focus:outline-none transition duration-300 btn-animate">
                         Convert
                     </button>
                 </form>
+
+                <!-- Set Alert Button with animation and glow (Point 5) -->
                 <div class="form-group mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
                     <input type="number" id="alertRate" class="w-full p-4 border-none rounded-lg bg-gray-700 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 mb-2" placeholder="Set alert rate">
-                    <button id="setAlert" class="w-full py-4 bg-green-500 text-white rounded-lg text-xl glow hover:bg-green-400 focus:outline-none transition duration-300">
+                    <button id="setAlert" class="w-full py-4 bg-green-500 text-white rounded-lg text-xl glow hover:bg-green-400 focus:outline-none transition duration-300 btn-animate">
                         Set Alert
                     </button>
                 </div>
+
+                <!-- Wallet Display -->
                 <div class="wallet-display mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
                     <h3 class="text-lg font-semibold mb-4">Your Wallet</h3>
                     <div class="bg-gray-700 text-gray-200 rounded-lg p-4">
                         <!-- Wallet Data Loaded Here -->
                     </div>
                 </div>
+
+                <!-- PayPal Button Container -->
                 <div id="paypal-button-container" class="mt-6"></div>
             </div>
 
-            <!-- Chart Section -->
+            <!-- Chart Sections (Point 7: Apply animations and shadow) -->
             <div class="grid grid-rows-3 gap-4">
                 <div class="bg-gray-800 p-6 rounded-lg shadow-lg chart-container">
                     <h3 class="text-lg font-semibold mb-4">Global Currency Strength Index</h3>
@@ -134,7 +228,7 @@
                 </div>
             </div>
 
-            <!-- Chart & News Section -->
+            <!-- Additional Chart & News Sections (Point 7) -->
             <div class="grid grid-rows-3 gap-4">
                 <div class="bg-gray-800 p-6 rounded-lg shadow-lg chart-container">
                     <h3 class="text-lg font-semibold mb-4">Country-Specific Inflation/Interest Rates</h3>
@@ -154,32 +248,44 @@
         <!-- News Section -->
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg mt-6">
             <h3 class="text-lg font-semibold mb-4">Latest News by Category</h3>
-            <h4 class="text-2xl text-cyan-400 mb-4">Forex</h4>
-            <div class="news-carousel space-x-4" id="forex-news"></div>
-
-            <h4 class="text-2xl text-green-400 mb-4">Crypto</h4>
-            <div class="news-carousel space-x-4" id="crypto-news"></div>
-
-            <h4 class="text-2xl text-yellow-400 mb-4">Commodities</h4>
-            <div class="news-carousel space-x-4" id="commodities-news"></div>
-
-            <h4 class="text-2xl text-blue-400 mb-4">Stocks</h4>
-            <div class="news-carousel space-x-4" id="stocks-news"></div>
-
-            <h4 class="text-2xl text-purple-400 mb-4">Bonds</h4>
-            <div class="news-carousel space-x-4" id="bonds-news"></div>
-
-            <h4 class="text-2xl text-red-400 mb-4">Banking</h4>
-            <div class="news-carousel space-x-4" id="banking-news"></div>
-
-            <h4 class="text-2xl text-pink-400 mb-4">Regulation</h4>
-            <div class="news-carousel space-x-4" id="regulation-news"></div>
-
-            <h4 class="text-2xl text-orange-400 mb-4">Macroeconomics</h4>
-            <div class="news-carousel space-x-4" id="macroeconomics-news"></div>
-
-            <h4 class="text-2xl text-indigo-400 mb-4">Fintech</h4>
-            <div class="news-carousel space-x-4" id="fintech-news"></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <h4 class="text-2xl text-cyan-400 mb-4">Forex</h4>
+                    <div class="news-carousel space-x-4" id="forex-news"></div>
+                </div>
+                <div>
+                    <h4 class="text-2xl text-green-400 mb-4">Crypto</h4>
+                    <div class="news-carousel space-x-4" id="crypto-news"></div>
+                </div>
+                <div>
+                    <h4 class="text-2xl text-yellow-400 mb-4">Commodities</h4>
+                    <div class="news-carousel space-x-4" id="commodities-news"></div>
+                </div>
+                <div>
+                    <h4 class="text-2xl text-blue-400 mb-4">Stocks</h4>
+                    <div class="news-carousel space-x-4" id="stocks-news"></div>
+                </div>
+                <div>
+                    <h4 class="text-2xl text-purple-400 mb-4">Bonds</h4>
+                    <div class="news-carousel space-x-4" id="bonds-news"></div>
+                </div>
+                <div>
+                    <h4 class="text-2xl text-red-400 mb-4">Banking</h4>
+                    <div class="news-carousel space-x-4" id="banking-news"></div>
+                </div>
+                <div>
+                    <h4 class="text-2xl text-pink-400 mb-4">Regulation</h4>
+                    <div class="news-carousel space-x-4" id="regulation-news"></div>
+                </div>
+                <div>
+                    <h4 class="text-2xl text-orange-400 mb-4">Macroeconomics</h4>
+                    <div class="news-carousel space-x-4" id="macroeconomics-news"></div>
+                </div>
+                <div>
+                    <h4 class="text-2xl text-indigo-400 mb-4">Fintech</h4>
+                    <div class="news-carousel space-x-4" id="fintech-news"></div>
+                </div>
+            </div>
         </div>
     </div>
 
