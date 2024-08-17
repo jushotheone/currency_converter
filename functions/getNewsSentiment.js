@@ -1,68 +1,97 @@
 const axios = require('axios');
 
-// RapidAPI Twinword API key
-const rapidApiKey = '1a7d5e8000msh30799faf663f753p1ba766jsn64824f945daf';
+const rapidApiKey = process.env.RAPID_API_KEY;
+const newsApiKey = process.env.NEWS_API_KEY;
+
+async function fetchSentimentWithRetry(articleDescription, retries = 3, delay = 2000) {
+    try {
+        return await axios.get(
+            'https://twinword-sentiment-analysis.p.rapidapi.com/analyze/',
+            {
+                params: { text: articleDescription },
+                headers: {
+                    'X-RapidAPI-Key': rapidApiKey,
+                    'X-RapidAPI-Host': 'twinword-sentiment-analysis.p.rapidapi.com',
+                },
+                timeout: 30000 // 30 seconds timeout
+            }
+        );
+    } catch (error) {
+        if (retries > 0) {
+            console.warn(`Retrying sentiment analysis... (${retries} retries left)`);
+            return new Promise((resolve) =>
+                setTimeout(() => resolve(fetchSentimentWithRetry(articleDescription, retries - 1, delay)), delay)
+            );
+        } else {
+            console.error(`Failed after retries: ${error.message}`, error.stack);  // Log detailed error
+            throw new Error(`Failed to analyze sentiment after multiple attempts: ${error.message}`);
+        }
+    }
+}
 
 exports.handler = async (event, context) => {
-  try {
-    // Fetch forex-related news articles from News API
-    const newsApiKey = '5ed6bdf83c124c429f912406482f0aae';
-    const newsResponse = await axios.get(`https://newsapi.org/v2/everything?q=forex&apiKey=${newsApiKey}`);
-    const articles = newsResponse.data.articles;
+    context.callbackWaitsForEmptyEventLoop = false; // Prevent premature timeout
 
-    if (!articles.length) {
-      return {
-        statusCode: 200,
-        headers: {
-            "Access-Control-Allow-Origin": "*", // CORS header
-        },
-        body: JSON.stringify({ message: 'No news articles found' })
-      };
-    }
+    const startTime = Date.now(); // Start timer
 
-    // Initialize sentiment analysis results
-    const sentimentResults = [];
+    try {
+        // Fetch forex-related news articles from News API
+        const newsResponse = await axios.get(`https://newsapi.org/v2/everything?q=forex&apiKey=${newsApiKey}`);
+        const articles = newsResponse.data.articles;
 
-    // Loop through each article to analyze sentiment
-    for (const article of articles) {
-      if (!article.description) continue;
-
-      // Send the description to Twinword Sentiment Analysis API via RapidAPI
-      const sentimentResponse = await axios.get(
-        'https://twinword-twinword-bundle-v1.p.rapidapi.com/sentiment_analysis/',
-        {
-          params: { text: article.description },
-          headers: {
-            'X-RapidAPI-Key': rapidApiKey,
-            'X-RapidAPI-Host': 'twinword-twinword-bundle-v1.p.rapidapi.com',
-          }
+        if (!articles.length) {
+            console.log('No news articles found.');
+            return {
+                statusCode: 200,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                },
+                body: JSON.stringify({ message: 'No news articles found' })
+            };
         }
-      );
 
-      // Push sentiment data and the related article into the results array
-      sentimentResults.push({
-        title: article.title,
-        description: article.description,
-        sentiment: sentimentResponse.data.type, // sentiment can be positive, neutral, or negative
-      });
+        const sentimentResults = [];
+
+        for (const article of articles) {
+            if (!article.description) continue;
+
+            try {
+                const sentimentResponse = await fetchSentimentWithRetry(article.description);
+                sentimentResults.push({
+                    title: article.title,
+                    description: article.description,
+                    sentiment: sentimentResponse.data.type,
+                });
+            } catch (sentimentError) {
+                console.error(`Error analyzing sentiment for article: ${article.title}`, sentimentError.message);
+                sentimentResults.push({
+                    title: article.title,
+                    description: article.description,
+                    sentiment: "error", 
+                });
+            }
+        }
+
+        const endTime = Date.now();
+        console.log(`Total Time Taken: ${(endTime - startTime) / 1000} seconds`);
+
+        return {
+            statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            },
+            body: JSON.stringify(sentimentResults)
+        };
+    } catch (error) {
+        console.error('Error fetching news or analyzing sentiment:', error.message, error.stack);  // Log full stack
+        return {
+            statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+            },
+            body: JSON.stringify({ error: 'Failed to fetch or analyze sentiment data' })
+        };
     }
-
-    // Return the analyzed sentiment results
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*", // CORS header
-      },
-      body: JSON.stringify(sentimentResults)
-    };
-  } catch (error) {
-    console.error('Error fetching news or analyzing sentiment:', error);
-    return {
-      statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*", // CORS header
-      },
-      body: JSON.stringify({ error: 'Failed to fetch or analyze sentiment data' })
-    };
-  }
 };

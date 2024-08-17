@@ -132,7 +132,7 @@
 
 <body class="bg-gray-900 text-gray-200 font-sans">
     <div class="container mx-auto p-6">
-        <!-- Header with Gradient effect (Point 1) -->
+        <!-- Header with Gradient effect -->
         <header class="text-center text-5xl font-bold mb-8 section-header">
             Quantro Dashboard
         </header>
@@ -140,16 +140,16 @@
         <div class="grid-layout">
             <!-- Currency Converter Section -->
             <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                <!-- Section header with gradient and creative currency selector (Point 2) -->
+                <!-- Section header with gradient and currency selector -->
                 <h2 class="text-center text-3xl font-bold mb-6 section-header">Currency Converter</h2>
                 <form action="#">
-                    <!-- Amount Input with focus effects (Point 6) -->
+                    <!-- Amount Input -->
                     <div class="mb-4">
                         <label for="amount" class="block text-lg font-semibold mb-2">Amount</label>
                         <input type="number" id="amount" class="w-full p-4 border-none rounded-lg bg-gray-700 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Amount">
                     </div>
 
-                    <!-- Currency Selectors with glow and custom styles (Points 1, 2, 3) -->
+                    <!-- Currency Selectors -->
                     <div class="form-group grid grid-cols-3 gap-4 mb-4">
                         <!-- From Currency -->
                         <div class="from">
@@ -163,7 +163,7 @@
                             </div>
                         </div>
 
-                        <!-- Swap Icon with animation (Point 3) -->
+                        <!-- Swap Icon with animation -->
                         <div class="icon flex justify-center items-center text-3xl text-blue-500">
                             <i class="fas fa-sync-alt"></i>
                         </div>
@@ -181,18 +181,18 @@
                         </div>
                     </div>
 
-                    <!-- Conversion Result with glow (Point 5) -->
+                    <!-- Conversion Result -->
                     <div class="exchange-rate text-center text-2xl font-semibold text-cyan-500 mb-4">
                         Receiving exchange rate...
                     </div>
 
-                    <!-- Convert Button with glowing effect (Point 4) -->
+                    <!-- Convert Button -->
                     <button type="submit" class="w-full py-4 bg-cyan-500 text-white rounded-lg text-xl glow convert-btn hover:bg-cyan-400 focus:outline-none transition duration-300 btn-animate">
                         Convert
                     </button>
                 </form>
 
-                <!-- Set Alert Button with animation and glow (Point 5) -->
+                <!-- Set Alert Button -->
                 <div class="form-group mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
                     <input type="number" id="alertRate" class="w-full p-4 border-none rounded-lg bg-gray-700 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 mb-2" placeholder="Set alert rate">
                     <button id="setAlert" class="w-full py-4 bg-green-500 text-white rounded-lg text-xl glow hover:bg-green-400 focus:outline-none transition duration-300 btn-animate">
@@ -212,7 +212,7 @@
                 <div id="paypal-button-container" class="mt-6"></div>
             </div>
 
-            <!-- Chart Sections (Point 7: Apply animations and shadow) -->
+            <!-- Chart Sections -->
             <div class="grid grid-rows-3 gap-4">
                 <div class="bg-gray-800 p-6 rounded-lg shadow-lg chart-container">
                     <h3 class="text-lg font-semibold mb-4">Global Currency Strength Index</h3>
@@ -228,7 +228,7 @@
                 </div>
             </div>
 
-            <!-- Additional Chart & News Sections (Point 7) -->
+            <!-- Additional Chart & News Sections -->
             <div class="grid grid-rows-3 gap-4">
                 <div class="bg-gray-800 p-6 rounded-lg shadow-lg chart-container">
                     <h3 class="text-lg font-semibold mb-4">Country-Specific Inflation/Interest Rates</h3>
@@ -286,6 +286,11 @@
                     <div class="news-carousel space-x-4" id="fintech-news"></div>
                 </div>
             </div>
+        </div>
+
+        <!-- Loading Spinner for News Sentiment Analysis -->
+        <div id="loadingSpinner" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style="display: none;">
+            <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-white"></div>
         </div>
     </div>
 

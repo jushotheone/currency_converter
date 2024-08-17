@@ -1,6 +1,6 @@
 [build]
   publish = "./"
-  functions = "functions"
+  functions = "functions"  # Path to your functions folder
 
 [[redirects]]
   from = "/*"
@@ -10,6 +10,19 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Headers = "Content-Type"
-    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Origin = "*"  # Allows all origins
+    Access-Control-Allow-Headers = "Content-Type"  # Allows Content-Type headers
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"  # HTTP methods allowed
+
+[functions]
+  # Define settings for functions
+  external_node_modules = ["module-one", "module-two"]
+
+[context.production.environment]
+  # Set environment variables for production
+  EXCHANGE_RATE_API_KEY = "dcb063aad8ea4242a6e32141"
+  ALPHAVANTAGE_API_KEY = "N0YQFQC35RNK8WHE"
+  RAPIDAPI_KEY = "1a7d5e8000msh30799faf663f753p1ba766jsn64824f945daf"
+  NEWS_API_KEY = "5ed6bdf83c124c429f912406482f0aae"
+  TRADING_ECONOMICS_API_KEY = "28fd8c4619114fb:r2dx8rjei7ddd6t"
+  NASDAQ_API_KEY = "2-nzs42kZNMvPEUnnCzy"

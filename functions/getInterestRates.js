@@ -1,6 +1,6 @@
 // getInterestRates.js
 exports.handler = async function (event, context) {
-    const apiKey = "28fd8c4619114fb:r2dx8rjei7ddd6t"; // Trading Economics API Key
+    const apiKey = process.env.TRADING_ECONOMICS_API_KEY; // Trading Economics API Key
     const url = `https://api.tradingeconomics.com/country?c=${apiKey}&f=json`;
 
     try {
