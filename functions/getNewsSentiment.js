@@ -13,6 +13,9 @@ exports.handler = async (event, context) => {
     if (!articles.length) {
       return {
         statusCode: 200,
+        headers: {
+            "Access-Control-Allow-Origin": "*", // CORS header
+        },
         body: JSON.stringify({ message: 'No news articles found' })
       };
     }
@@ -47,12 +50,18 @@ exports.handler = async (event, context) => {
     // Return the analyzed sentiment results
     return {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*", // CORS header
+      },
       body: JSON.stringify(sentimentResults)
     };
   } catch (error) {
     console.error('Error fetching news or analyzing sentiment:', error);
     return {
       statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*", // CORS header
+      },
       body: JSON.stringify({ error: 'Failed to fetch or analyze sentiment data' })
     };
   }
